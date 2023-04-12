@@ -7,17 +7,18 @@ terraform {
 }
 
 provider "aws" {
-  # profile    = "ada" # Aqui vai o "profile" que você configurou as credenciais da AWS.
+  profile    = "ada" # Aqui vai o "profile" que você configurou as credenciais da AWS.
   region     = "us-east-1" 
-  access_key = "my-access-key"
-  secret_key = "my-secret-key"
+  # access_key = "my-access-key"
+  # secret_key = "my-secret-key"
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "de-op-009-bucket"
+  bucket = "de-op-009-bucket-diego"
 
   tags = {
     Name        = "Meu bucket de testes inicial"
+    Turma = "DE-OP-009-983"
   }
 }
 
