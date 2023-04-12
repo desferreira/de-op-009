@@ -16,7 +16,8 @@ resource "aws_s3_bucket" "b" {
   bucket = "de-op-009-bucket"
 
   tags = {
-    Name        = "Meu bucket"
+    Name        = "Meu bucket com site"
+    Turma = "DE-OP-009-983"
   }
 }
 
@@ -36,8 +37,6 @@ resource "aws_s3_bucket_policy" "website_access" {
             ]
           }
           POLICY
-
-
 }
 
 resource "aws_s3_bucket_website_configuration" "example" {
