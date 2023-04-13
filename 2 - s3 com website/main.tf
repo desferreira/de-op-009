@@ -13,7 +13,8 @@ provider "aws" {
 
 
 resource "aws_s3_bucket" "b" {
-  bucket = "de-op-009-bucket"
+  bucket = "de-op-009-bucket-diego-prof"
+  force_destroy = true
 
   tags = {
     Name        = "Meu bucket com site"
@@ -50,6 +51,14 @@ resource "aws_s3_bucket_website_configuration" "example" {
     key = "error.html"
   }
 
+}
+
+output "bucket_name" {
+  value = aws_s3_bucket.b.bucket
+}
+
+output "bucket_url" {
+  value = aws_s3_bucket_website_configuration.example.website_endpoint
 }
 
 # aws s3 cp FILE s3://BUCKET_NAME --profile ada
