@@ -30,3 +30,5 @@
 - Condições, Types, Laços e Blocos Dinâmicos
 
 - Terraform Cloud e Terraform CLI
+
+- Link do projeto: https://docs.google.com/document/d/1_v6qQ_aNkHBmggvJyBVhGfeS4hHmsJAJE0cey12a7ys/edit?usp=sharing
