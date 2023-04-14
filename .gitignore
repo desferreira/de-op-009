@@ -28,6 +28,7 @@ replay_pid*
 terraform.tfstate*
 
 roteiro.md
+aulas.md
 
 pdfs/*
 gabaritos/*
