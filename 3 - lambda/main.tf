@@ -12,7 +12,7 @@ provider "aws" {
 }
 
 resource "aws_s3_bucket" "b" {
-  bucket = "de-op-009-bucket-diego-lambda"
+  bucket = "de-op-009-bucket-diego-lambda-v2"
   force_destroy = true
 
   tags = {
@@ -21,6 +21,9 @@ resource "aws_s3_bucket" "b" {
   }
 }
 
+# Cria um documento para política do "lambda ser um lambda", assumir uma role.
+# Pode ser utilizado também um objeto do tipo aws_s3_bucket_policy, como temos no 2 - s3 com website. 
+# São duas formas de "fazer a mesma coisa". 
 data "aws_iam_policy_document" "assume_role" {
   statement {
     effect = "Allow"
@@ -60,7 +63,8 @@ resource "aws_iam_policy" "function_logging_policy" {
   })
 }
 
-# Aqui eu adiciono mais uma policy à role do lambda. Posso adicionar quantas forem necessárias
+# Aqui eu adiciono mais uma policy à role do lambda. 
+# Posso adicionar quantas forem necessárias
 resource "aws_iam_role_policy_attachment" "function_logging_policy_attachment" {
   role = aws_iam_role.iam_for_lambda.id
   policy_arn = aws_iam_policy.function_logging_policy.arn
@@ -74,15 +78,17 @@ data "archive_file" "lambda" {
 }
 
 resource "aws_lambda_function" "test_lambda" {
-  function_name = "minhaLambda"
+  function_name = var.nome_lambda
   filename      = "lambda_function_payload.zip"
   role          = aws_iam_role.iam_for_lambda.arn
   handler       = "lambda_function.lambda_metodo"
 
   source_code_hash = "${data.archive_file.lambda.output_base64sha256}"
 
-  runtime = "python3.9"
+  runtime = var.versao_python
 
+# Coloco nos environments tudo que eu quiser que minha função lambda tenha acesso em 
+# tempo de execução. Por exemplo: URL de banco de dados, usuário, senha...
   environment {
     variables = {
       variavel01 = "valor01"
@@ -96,24 +102,25 @@ resource "aws_s3_bucket_notification" "aws_lambda_trigger" {
   bucket = aws_s3_bucket.b.id
   lambda_function {
     lambda_function_arn = aws_lambda_function.test_lambda.arn
-    events              = ["s3:ObjectCreated:*", "s3:ObjectRemoved:*"]
+    events              = var.eventos_lambda_s3
   }
 
-  # O depends_on aqui garante que esse recurso "aws_s3_bucket_notification" só será criado APÓS  "aws_lambda_permission" "test", que é um "pré requisito"
-  depends_on = [aws_lambda_permission.test] 
+  # O depends_on aqui garante que esse recurso "aws_s3_bucket_notification" 
+  # só será criado APÓS  "aws_lambda_permission" "invoke_function", que é um "pré requisito"
+  depends_on = [aws_lambda_permission.invoke_function] 
 }
 
 # Aqui eu crio um log group no cloudwatch... um log group pode ser considerado uma "pastinha" para armazenar todos os logs de uma determinada função
 resource "aws_cloudwatch_log_group" "function_log_group" {
   name              = "/aws/lambda/${aws_lambda_function.test_lambda.function_name}"
-  retention_in_days = 7
+  retention_in_days = var.retencao_logs
   lifecycle {
     prevent_destroy = false
   }
 }
 
 # Adiciono permissões ao meu bucket s3 para invocar (fazer trigger) à minha função lambda.
-resource "aws_lambda_permission" "test" {
+resource "aws_lambda_permission" "invoke_function" {
   statement_id  = "AllowS3Invoke"
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.test_lambda.function_name
