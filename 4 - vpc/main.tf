@@ -11,6 +11,7 @@ provider "aws" {
   region  = "us-east-1"
 }
 
+# Cria uma VPC, um tipo de rede privada dentro da AWS.
 resource "aws_vpc" "dev-vpc" {
   cidr_block = "172.16.1.0/25"
 
@@ -19,6 +20,7 @@ resource "aws_vpc" "dev-vpc" {
   }
 }
 
+# Cria uma subnet que pertence àquela rede privada
 resource "aws_subnet" "private-subnet1" {
   vpc_id            = aws_vpc.dev-vpc.id
   cidr_block        = "172.16.1.48/28"
@@ -29,6 +31,7 @@ resource "aws_subnet" "private-subnet1" {
   }
 }
 
+# Cria outra subnet que pertence àquela rede privada
 resource "aws_subnet" "private-subnet2" {
   vpc_id            = aws_vpc.dev-vpc.id
   cidr_block        = "172.16.1.64/28"
