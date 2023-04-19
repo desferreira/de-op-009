@@ -11,15 +11,6 @@ provider "aws" {
   region  = "us-east-1"
 }
 
-# 1. Create vpc
-resource "aws_vpc" "rds-vpc" {
-  cidr_block = "172.16.1.0/25"
-
-  tags = {
-    Name = "dev"
-  }
-}
-
 # Cria uma VPC, um tipo de rede privada dentro da AWS.
 resource "aws_vpc" "dev-vpc" {
   cidr_block = "172.16.1.0/25" # o /25 indica a quantidade de IPs disponíveis para máquinas na rede
