@@ -15,3 +15,10 @@ variable "subnet_count" {
   default = 3
   description = "Número de subnets a serem criadas"
 }
+
+variable "producao" {
+  type = bool
+  default = false
+  description = "Variável que indica se as configs são de produção ou não."
+
+}

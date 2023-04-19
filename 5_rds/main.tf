@@ -1,16 +1,3 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-  profile = "ada"
-  region  = "us-east-1"
-}
-
 # Cria uma VPC, um tipo de rede privada dentro da AWS.
 resource "aws_vpc" "dev-vpc" {
   cidr_block = "172.16.1.0/25" # o /25 indica a quantidade de IPs disponíveis para máquinas na rede
@@ -32,6 +19,9 @@ resource "aws_subnet" "private-subnet" {
   }
 }
 
+# Daqui pra baixo é novidade, relacionada ao RDS.
+# O db_subnet_groups associa o RDS à um grupo de subnets. Ou seja, garantimos que o nosos
+# banco de dados vai ser "criado" em subnets conhecidas que fazem parte da nossa VPC
 resource "aws_db_subnet_group" "db-subnet" {
   name       = "db_subnet_group"
   subnet_ids = [aws_subnet.private-subnet[0].id, aws_subnet.private-subnet[1].id]
@@ -45,19 +35,11 @@ resource "aws_security_group" "allow_db" {
   vpc_id      = aws_vpc.dev-vpc.id
 
   ingress {
-    description = "HTTPS"
+    description = "Porta de conexao ao Postgres"
     from_port   = 5432
     to_port     = 5432
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # aws_vpc.dev-vpc.cidr_blocks
-  }
-
-  egress {
-    description = "HTTPS"
-    from_port   = 5432
-    to_port     = 5432
-    protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"] # aws_vpc.dev-vpc.cidr_blocks
+    cidr_blocks = [aws_vpc.dev-vpc.cidr_block] # aws_vpc.dev-vpc.cidr_blocks
   }
 
   tags = {
@@ -67,11 +49,22 @@ resource "aws_security_group" "allow_db" {
 
 # Cria uma instância de RDS
 resource "aws_db_instance" "mysql" {
-  allocated_storage = 10
+  # OPERADOR TERNÁRIO
+  # VARIAVEL_comparacao ? caso verdadeiro : caso falso
+  # vamos supor que i = 3
+  # i > 2 ? print(i é maior que 2) : print(i é menor que 2) 
+  # i > 2 ? print(i é maior que 2) : i < 5 ? print(i é menor que 5) : i < 4 ?   
+  # if i > 2:
+  #  print(i é maior que 2)
+  #  else:
+  #   print(i é menor que 2)
+
+  allocated_storage = var.producao ? 50 : 10 # Espaço em disco em GB!
+  identifier        = "banquinho"
   db_name           = "mydb"
   engine            = "postgres"
   engine_version    = "12.9"
-  instance_class    = "db.t3.micro"
+  instance_class    = var.producao ? "db.t2.micro" : "db.t3.micro"
   username          = "username" # Nome do usuário "master"
   password          = "password" # Senha do usuário master
   port              = 5432
@@ -85,8 +78,4 @@ resource "aws_db_instance" "mysql" {
   skip_final_snapshot    = true
   db_subnet_group_name   = aws_db_subnet_group.db-subnet.name
   vpc_security_group_ids = [aws_security_group.allow_db.id]
-}
-
-output "rds_connection_string" {
-  value = aws_db_instance.mysql.endpoint
 }
