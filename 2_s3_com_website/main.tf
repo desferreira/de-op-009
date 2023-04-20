@@ -1,19 +1,5 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-  profile    = "ada" # Aqui vai o "profile" que você configurou as credenciais da AWS.
-  region     = "us-east-1" 
-}
-
-
 resource "aws_s3_bucket" "b" {
-  bucket = "de-op-009-bucket-diego-prof"
+  bucket = var.bucket_name
   force_destroy = true
 
   tags = {

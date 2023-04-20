@@ -1,7 +1,12 @@
+variable "vpc_cird" {
+  type = string
+  default = "172.16.1.0/25"
+  description = "CIDR da vpc"
+}
 variable "subnet_cidr_block" {
     type = list
     default = ["172.16.1.48/28", "172.16.1.64/28", "172.16.1.80/28"]
-    description = "CIDR block as subnets"
+    description = "CIDR block das subnets"
 }
 
 variable "subnet_availability_zone" {

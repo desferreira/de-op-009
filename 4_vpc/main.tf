@@ -1,19 +1,6 @@
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-    }
-  }
-}
-
-provider "aws" {
-  profile = "ada"
-  region  = "us-east-1"
-}
-
 # Cria uma VPC, um tipo de rede privada dentro da AWS.
 resource "aws_vpc" "dev-vpc" {
-  cidr_block = "172.16.1.0/25" # o /25 indica a quantidade de IPs disponíveis para máquinas na rede
+  cidr_block = var.vpc_cird # o /25 indica a quantidade de IPs disponíveis para máquinas na rede
 
   tags = {
     Name = "VPC 1 - DE-OP-009"
