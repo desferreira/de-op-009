@@ -32,3 +32,14 @@
 - Terraform Cloud e Terraform CLI
 
 - Link do projeto: https://docs.google.com/document/d/1_v6qQ_aNkHBmggvJyBVhGfeS4hHmsJAJE0cey12a7ys/edit?usp=sharing
+
+Possíveis problemas
+
+- Adicionar uma VPC para o Lamba
+- Adicionar as dependências do código python no package da lambda
+- Passar as variáveis do banco de dados para a Lambda
+
+
+Links úteis:
+
+- https://docs.aws.amazon.com/pt_br/lambda/latest/dg/python-package.html
