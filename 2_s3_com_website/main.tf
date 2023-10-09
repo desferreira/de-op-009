@@ -1,9 +1,9 @@
 resource "aws_s3_bucket" "b" {
-  bucket = var.bucket_name
+  bucket        = var.bucket_name
   force_destroy = true
 
   tags = {
-    Name        = "Meu bucket com site"
+    Name  = "Meu bucket com site"
     Turma = "DE-OP-009-983"
   }
 }
@@ -24,6 +24,10 @@ resource "aws_s3_bucket_policy" "website_access" {
             ]
           }
           POLICY
+
+  depends_on = [
+    aws_s3_bucket.b
+  ]
 }
 
 resource "aws_s3_bucket_website_configuration" "example" {
@@ -36,6 +40,10 @@ resource "aws_s3_bucket_website_configuration" "example" {
   error_document {
     key = "error.html"
   }
+
+  depends_on = [
+    aws_s3_bucket_policy.website_access
+  ]
 
 }
 
